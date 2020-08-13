@@ -272,7 +272,16 @@ link_tbl %>%
 
 ## Anyone have a website the want to scrape using `rvest`?
 
+url <- "https://fivethirtyeight.com/features/how-fivethirtyeights-2020-presidential-forecast-works-and-whats-different-because-of-covid-19/"
 
+
+url %>%
+  xml2::read_html() %>% 
+  rvest::html_nodes("li") %>% 
+  rvest::html_text()
+
+  
+  
 ##############################
 ### Selenium
 
@@ -790,3 +799,160 @@ raw[50] %>%
 
 
 ### Any q's?
+
+# credentials Sys.getenv("EMAIL") uesthis::edit_r_environ()
+
+url <- "https://www.bankofengland.co.uk/news/speeches"
+
+
+
+sess <- start_session(url, version = version)
+
+using <- "class"
+
+value <- "pagination-pages"
+
+n_pages <- sess %>% 
+  extract_html() %>% 
+  html_nodes(".pagination-pages") %>% 
+  rvest::html_text() %>% 
+  str_remove("Page [0-9]+ of ") %>% 
+  as.integer()
+
+
+sess %>% 
+  seleniumPipes::executeScript("CP.NEWS.initPagination(this);")
+
+sess %>% 
+  click(
+    using = "class",
+    value = "pagination-next"
+  )
+
+grab_all_speeches <- function(sess, n) {
+  out <- c()
+  
+  for (i in seq(n)) {
+    # do this stuff
+    this <- "foo"
+    
+    message(glue::glue("Moving to page {i}."))
+      
+    sess %>% 
+      click(
+        using = "class",
+        value = "pagination-next"
+      )
+    
+    out <- c(out, this)
+    
+  }
+  out
+}
+
+grab_all_speeches(sess, n = n_pages)
+
+
+
+url <-  "https://app.acgme.org/ads/Public/ProgrG"
+
+
+### Any q's?
+
+###### In-session participant examples:
+
+### Bank of England Speeches
+
+url <- "https://www.bankofengland.co.uk/news/speeches"
+
+sess <- start_session(url, version = version)
+
+using <- "class"
+value <- "pagination-pages"
+
+n_pages <- 
+  sess %>% 
+  extract_html() %>% 
+  html_nodes(".pagination-pages") %>% 
+  rvest::html_text() %>% 
+  str_remove("Page [0-9]+ of ") %>% 
+  as.integer()
+
+sess %>% 
+  click(
+    using = "class",
+    value = "pagination-next"
+  )
+
+grab_all_speeches <- function(sess, n) {
+  out <- c()
+  
+  for (i in seq(n)) {
+    # do the stuff
+    this <- "foo"
+    
+    message(glue::glue("Moving to page {i}."))
+    
+    sess %>% 
+      click(
+        using = "class",
+        value = "pagination-next"
+      )
+    
+    out <- c(out, this)
+  }
+  out
+}
+
+grab_all_speeches(sess, n = n_pages)
+
+
+#### Nephrology
+
+url <- "https://apps.acgme.org/ads/Public/Programs/Search"
+
+sess <- start_session(url, version = version)
+
+dropdown_xpath <- "/html/body/div[2]/div/div[2]/div[1]/div/div[4]/div/div[1]/form/select[2]"
+
+option_n <- 41
+
+sess %>% 
+  click(
+    using = "id",
+    value = "#s2id_specialtyFilter b"
+  )
+
+sess %>% 
+  click(
+    using = "xpath",
+    value = "/html/body/div[8]/ul/li[1]/div"
+  )
+
+sess %>% 
+  dropdown_select(
+    dropdown_xpath,
+    41
+  )
+
+
+### Postgrados
+
+url <- "http://appcmi.ces.gob.ec/oferta_vigente/maestrias/postgrados.php"
+
+sess <- start_session(url, version = version)
+
+sess %>% 
+  click(
+    "class",
+    "btn btn-primary"
+  )
+
+sess %>% 
+  extract_html() %>% 
+  rvest::html_nodes("table") %>% 
+  rvest::html_table(fill = TRUE) %>% 
+  .[[1]] %>% 
+  as_tibble()
+
+
